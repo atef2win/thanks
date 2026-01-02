@@ -1,45 +1,50 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Redirection…</title>
-    <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px; }
-      code { background:#f4f4f4; padding:2px 6px; border-radius:6px; }
-    </style>
-  </head>
-  <body>
-    <h3>Redirection…</h3>
-    <p id="status">Lecture du <code>client_id</code>…</p>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Redirection…</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px; }
+    code { background:#f4f4f4; padding:2px 6px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <h3>Redirection…</h3>
+  <p id="status">Lecture du <code>client_id</code>…</p>
 
-    <script>
-      (function () {
-        const p = new URLSearchParams(window.location.search);
-        const clientId = p.get('client_id');
+  <script>
+    (function () {
+      const status = document.getElementById('status');
 
-        const status = document.getElementById('status');
+      // 1) Essayer URL (si un jour Tally le met)
+      const p = new URLSearchParams(window.location.search);
+      let clientId = p.get('client_id');
 
-        // DEBUG visible
-        console.log('[THANKS] href=', window.location.href);
-        console.log('[THANKS] client_id=', clientId);
+      // 2) Fallback: localStorage (SOURCE DE VÉRITÉ avec ta landing)
+      if (!clientId || !clientId.trim() || clientId.includes('{{') || clientId.includes('}}')) {
+        clientId = localStorage.getItem('aaw_client_id'); // doit matcher ta landing
+      }
 
-        if (!clientId || !clientId.trim() || clientId.includes('{{') || clientId.includes('}}')) {
-          status.innerHTML = "Erreur : <code>client_id</code> absent dans l’URL. Reviens à la landing page et relance le formulaire via le bon lien.";
-          return;
-        }
+      console.log('[THANKS] href=', window.location.href);
+      console.log('[THANKS] client_id(resolved)=', clientId);
 
-        // Optionnel : validation format
-        if (!clientId.startsWith('client_')) {
-          status.innerHTML = "Erreur : <code>client_id</code> invalide (" + clientId + ").";
-          return;
-        }
+      if (!clientId || !clientId.trim()) {
+        status.innerHTML = "Erreur : <code>client_id</code> introuvable. Reviens à la landing page et relance le formulaire via le bon bouton.";
+        return;
+      }
 
-        status.textContent = "OK. Redirection vers le chat…";
+      // Validation stricte comme ton chatbot
+      if (!clientId.startsWith('client_')) {
+        status.innerHTML = "Erreur : <code>client_id</code> invalide (" + clientId + ").";
+        return;
+      }
 
-        const target = `https://atef2win.github.io/agent-chat-interface/?mode=initial&client_id=${encodeURIComponent(clientId)}`;
-        window.location.replace(target);
-      })();
-    </script>
-  </body>
+      status.textContent = "OK. Redirection vers le chat…";
+
+      const target = `https://atef2win.github.io/agent-chat-interface/?mode=initial&client_id=${encodeURIComponent(clientId)}`;
+      window.location.replace(target);
+    })();
+  </script>
+</body>
 </html>
