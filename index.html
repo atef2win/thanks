@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>Redirection...</title></head>
+  <body>
+    <p>Redirection…</p>
+    <script>
+      const p = new URLSearchParams(window.location.search);
+      const clientId = p.get('clientid');
+
+      // Si Tally ne transmet pas le querystring, tu ne pourras pas deviner l'UUID ici.
+      // Donc on force un fallback clair.
+      if (!clientId || !clientId.startsWith('client')) {
+        document.body.innerHTML = "<p>Erreur: client_id introuvable. Reviens à la landing page et relance le formulaire.</p>";
+      } else {
+        window.location.href =
+          https://atef2win.github.io/agent-chat-interface/?mode=initial&client_id=${encodeURIComponent(clientId)};
+      }
+    </script>
+  </body>
+</html>
